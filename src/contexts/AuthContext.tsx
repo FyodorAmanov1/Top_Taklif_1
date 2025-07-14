@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   User, 
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -47,21 +46,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Handle redirect result on page load
-    const handleRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          // User successfully signed in via redirect
-          console.log('Redirect sign-in successful');
-        }
-      } catch (error) {
-        console.error('Redirect result error:', error);
-      }
-    };
-
-    handleRedirectResult();
-
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser({
@@ -84,7 +68,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithRedirect(auth, googleProvider);
+      // Configure Google provider
+      googleProvider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log('Google sign-in successful:', result.user);
     } catch (error) {
       console.error('Google sign in error:', error);
       throw error;
@@ -93,7 +83,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithFacebook = async () => {
     try {
-      await signInWithRedirect(auth, facebookProvider);
+      // Configure Facebook provider
+      facebookProvider.setCustomParameters({
+        display: 'popup'
+      });
+      
+      const result = await signInWithPopup(auth, facebookProvider);
+      console.log('Facebook sign-in successful:', result.user);
     } catch (error) {
       console.error('Facebook sign in error:', error);
       throw error;
