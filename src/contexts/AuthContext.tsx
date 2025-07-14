@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   User, 
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -46,6 +48,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Handle redirect results
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log('Redirect sign-in successful:', result.user);
+        }
+      } catch (error) {
+        console.error('Redirect result error:', error);
+      }
+    };
+
+    handleRedirectResult();
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser({
@@ -73,8 +89,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         prompt: 'select_account'
       });
       
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log('Google sign-in successful:', result.user);
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        console.log('Google sign-in successful:', result.user);
+        return result;
+      } catch (error: any) {
+        // If popup is blocked, fallback to redirect
+        if (error.code === 'auth/popup-blocked') {
+          console.log('Popup blocked, falling back to redirect...');
+          await signInWithRedirect(auth, googleProvider);
+          return; // Redirect will handle the result
+        }
+        throw error;
+      }
     } catch (error) {
       console.error('Google sign in error:', error);
       throw error;
@@ -88,8 +115,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         display: 'popup'
       });
       
-      const result = await signInWithPopup(auth, facebookProvider);
-      console.log('Facebook sign-in successful:', result.user);
+      try {
+        const result = await signInWithPopup(auth, facebookProvider);
+        console.log('Facebook sign-in successful:', result.user);
+        return result;
+      } catch (error: any) {
+        // If popup is blocked, fallback to redirect
+        if (error.code === 'auth/popup-blocked') {
+          console.log('Popup blocked, falling back to redirect...');
+          await signInWithRedirect(auth, facebookProvider);
+          return; // Redirect will handle the result
+        }
+        throw error;
+      }
     } catch (error) {
       console.error('Facebook sign in error:', error);
       throw error;
