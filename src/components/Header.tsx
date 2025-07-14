@@ -161,7 +161,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
       
       {/* Settings Panel */}
-                <span className="text-sm font-medium">{t('signUp')}</span>
+      {isSettingsOpen && (
         <div data-panel="settings">
           <SettingsPanel onClose={() => setIsSettingsOpen(false)} />
         </div>
