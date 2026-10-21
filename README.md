@@ -1,72 +1,47 @@
-# TopRaklif - AI-Powered Deals Platform
+# Top Taklif · Local Deals Explorer
 
-## Authentication Setup
+**Browse Tashkent offers through searchable cards and an interactive city map.**
 
-To enable authentication features, you need to configure the following services:
+Top Taklif is a React/TypeScript product prototype for local deal discovery. It combines offer filtering, map browsing, account interfaces and theme controls, giving the same collection several ways to be explored.
 
-### Firebase Setup (Google & Facebook Login)
+## Interface features
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or use existing one
-3. Enable Authentication and configure providers:
-   - **Google**: Enable Google provider
-   - **Facebook**: Enable Facebook provider and add your Facebook App ID and secret
-4. Get your Firebase config and update `src/config/firebase.ts`:
+- Switch between grid and map views.
+- Filter offers by category, price, discount and district.
+- Explore deal details, notification panels and summary cards.
+- Use multilingual interface resources and light/dark themes.
+- Request location access for map-related interactions.
+- Explore guest mode and Firebase-backed authentication components.
 
-```javascript
-const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id"
-};
+The application initializes its offers from [src/data/mockDeals.ts](src/data/mockDeals.ts). Displayed deals, account statistics and notifications are prototype data rather than a verified live merchant feed or a record of real savings.
+
+## Run locally
+
+Use Node.js/npm from the repository root:
+
+```bash
+npm install
+npm run dev
 ```
 
-### Telegram Bot Setup
+Open the URL printed by Vite. For a production bundle, use `npm run build`; `npm run preview` serves the generated bundle locally.
 
-1. Create a bot with [@BotFather](https://t.me/botfather)
-2. Get your bot token
-3. Set up domain for Telegram Login Widget
-4. Update the bot name in `AuthModal.tsx`:
+## Authentication configuration
 
-```javascript
-<TelegramLoginButton
-  botName="your_bot_name" // Replace with your bot username
-  onAuth={handleTelegramAuth}
-  disabled={loading}
-/>
-```
+Google, Facebook and email/password paths use Firebase Authentication. Configure your own Firebase project and the providers required by [src/config/firebase.ts](src/config/firebase.ts), then set the permitted application domains in that project.
 
-### Facebook App Setup
+The Telegram login widget has a separate client path. Its current handler creates local user state and does not provide a complete server-verified Telegram login. A bot token belongs on a server and should not be placed in the frontend.
 
-1. Go to [Facebook Developers](https://developers.facebook.com/)
-2. Create a new app
-3. Add Facebook Login product
-4. Configure OAuth redirect URIs
-5. Get your App ID and App Secret for Firebase configuration
+## Repository guide
 
-## Features
+| Location | Role |
+|---|---|
+| [src/App.tsx](src/App.tsx) | Deal views, filters and application state |
+| [src/components](src/components/) | Cards, map, account and notification interfaces |
+| [src/contexts](src/contexts/) | Authentication and theme state |
+| [src/data/mockDeals.ts](src/data/mockDeals.ts) | Example offer collection |
+| [src/i18n](src/i18n/) | Translation resources |
 
-- ✅ Google OAuth Login
-- ✅ Facebook OAuth Login  
-- ✅ Telegram Login Widget
-- ✅ Email/Password Authentication
-- ✅ User Profile Management
-- ✅ Persistent Authentication State
-- ✅ Beautiful UI with Dark Mode Support
+## Prototype scope
 
-## Usage
-
-1. Install dependencies: `npm install`
-2. Configure authentication providers (see above)
-3. Start development server: `npm run dev`
-4. Users can now register/login with multiple providers
-
-## Security Notes
-
-- Never commit your Firebase config with real credentials to public repositories
-- Use environment variables for production deployments
-- Implement proper server-side validation for Telegram authentication
-- Set up proper CORS and domain restrictions for all providers
+The project focuses on discovery and interface interaction. It does not include a merchant ingestion service, payment processing or a booking backend. Some controls, including distance sorting, still contain placeholder behavior; evaluate those separately from the implemented card/map presentation.
